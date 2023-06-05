@@ -1,13 +1,14 @@
 from django.db import models
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=255)
-    slug = models.CharField(max_length=255, blank=True)
+    title = models.CharField(_("Name"), max_length=255)
+    slug = models.CharField(max_length=255, blank=True, unique=True)
     parent = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True, related_name="child_category")
 
     def __str__(self):
@@ -21,7 +22,8 @@ class Category(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.CharField(max_length=100, blank=True)
+    slug = models.CharField(max_length=100, blank=True, unique=True)
+    image = models.ImageField(upload_to='static/images/', null=True)
 
     def __str__(self):
         return str(self.name)

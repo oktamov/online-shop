@@ -23,6 +23,7 @@ from django.urls import path, include, re_path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from django.conf.urls.i18n import i18n_patterns
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,13 +38,13 @@ schema_view = get_schema_view(
     permission_classes=[permissions.AllowAny],
 )
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('common.urls')),
     path('', include('users.urls')),
-    path('', include('product_smartphone_gadjet.urls')),
+    path('products/', include('product.urls')),
 
-]
+)
 
 swagger_urls = [
     re_path(r'swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -54,4 +55,4 @@ swagger_urls = [
 urlpatterns += swagger_urls
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

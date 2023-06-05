@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ProductTelefonGadjetConfig(AppConfig):
+class NotificationsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'product_smartphone_gadjet'
+    name = 'notifications'

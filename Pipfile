@@ -7,6 +7,9 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 drf-yasg = "*"
+django-modeltranslation = "*"
+pillow = "*"
+django-filter = "*"
 
 [dev-packages]
 

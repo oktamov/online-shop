@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from product_smartphone_gadjet.models import Category, Brand
+from .models import Category, Brand
 
 
 class ChildCategory(serializers.ModelSerializer):
@@ -21,4 +21,4 @@ class CategorySerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'name', 'slug', 'image']

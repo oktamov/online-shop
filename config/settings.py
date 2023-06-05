@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'modeltranslation',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,15 +40,19 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_yasg',
+    'django_filters',
 
     'common',
     'users',
-    'product_smartphone_gadjet',
+    'product',
+    'cart',
+    'notifications',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -105,9 +111,20 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uz'
+LANGUAGES = (
+    ("uz", "Uzbek"),
+    ("ru", "Russian"),
+    ("en", "English"),
+)
+MODELTRANSLATION_LANGUAGES = ("uz", "ru", "en")
+MODELTRANSLATION_DEFAULT_LANGUAGE = "uz"
 
-TIME_ZONE = 'UTC'
+MODELTRANSLATION_TRANSLATION_FILES = (
+    "common.translation",
+)
+
+TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 
@@ -117,7 +134,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -133,3 +150,6 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = "users.User"
 
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
