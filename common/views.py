@@ -21,11 +21,12 @@ class BaseCategoryView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
-class CategoryProductView(APIView):
+class CategoryProductView(APIView, CustomPageNumberPagination):
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     ordering_fields = ['price', 'rating', 'updated_year']
     search_fields = ['name']
     filterset_class = CategoryFilter
+    serializer_class = ProductSerializer
 
     @swagger_auto_schema(method='get')
     def get(self, request, slug):
@@ -48,8 +49,16 @@ class CategoryProductView(APIView):
                 products = products.order_by('-updated_year')
 
             filter_set = CategoryFilter(request.GET, queryset=products)
-            serializer = ProductSerializer(filter_set.qs, many=True)
+            # ----
+
+            page = self.paginate_queryset(filter_set.qs)
+            if page is not None:
+                serializer = self.serializer_class(page, many=True)
+                return self.get_paginated_response(serializer.data)
+
+            serializer = self.serializer_class(filter_set.qs, many=True)
             return Response(serializer.data)
+            # ----
         except Category.DoesNotExist:
             return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
 
