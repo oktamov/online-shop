@@ -27,9 +27,9 @@ from django.conf.urls.i18n import i18n_patterns
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Blog Post Api",
+        title="Online Shop",
         default_version='v1',
-        description="P10 2023 test API",
+        description="online shop, github code: https://github.com/oktamov/online-shop",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="mr006developer@gmail.com"),
         license=openapi.License(name="BSD License"),

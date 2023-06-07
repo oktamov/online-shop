@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'product',
     'cart',
     'notifications',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -145,7 +146,9 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
-    ]
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+
 }
 
 AUTH_USER_MODEL = "users.User"

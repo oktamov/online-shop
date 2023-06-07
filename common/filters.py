@@ -1,11 +1,23 @@
-import django_filters
+from django_filters import rest_framework as filters
 
-from common.models import Brand
+from product.models import Product
 
 
-class BrandFilter(django_filters.FilterSet):
-    field_name = django_filters.CharFilter(lookup_expr='icontains')
+class BrandFilter(filters.FilterSet):
+    category = filters.CharFilter(field_name='category__title', lookup_expr='iexact')
+    min_price = filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = filters.NumberFilter(field_name='price', lookup_expr='lte')
 
     class Meta:
-        model = Brand
-        fields = ['name']
+        model = Product
+        fields = ['category', 'min_price', 'max_price']
+
+
+class CategoryFilter(filters.FilterSet):
+    brand = filters.CharFilter(field_name='brand__name', lookup_expr='iexact')
+    min_price = filters.NumberFilter(field_name='price', lookup_expr='gte')
+    max_price = filters.NumberFilter(field_name='price', lookup_expr='lte')
+
+    class Meta:
+        model = Product
+        fields = ['brand', 'min_price', 'max_price']
