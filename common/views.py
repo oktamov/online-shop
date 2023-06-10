@@ -49,7 +49,6 @@ class CategoryProductView(APIView, CustomPageNumberPagination):
                 products = products.order_by('-updated_year')
 
             filter_set = CategoryFilter(request.GET, queryset=products)
-            # ----
 
             page = self.paginate_queryset(filter_set.qs)
             if page is not None:

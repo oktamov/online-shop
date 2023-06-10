@@ -10,6 +10,10 @@ drf-yasg = "*"
 django-modeltranslation = "*"
 pillow = "*"
 django-filter = "*"
+django-environ = "*"
+django-rest-auth = "*"
+redis = "*"
+celery = "*"
 
 [dev-packages]
 

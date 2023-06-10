@@ -14,8 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -41,8 +40,10 @@ schema_view = get_schema_view(
 urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('common.urls')),
-    path('', include('users.urls')),
+    path('users/', include('users.urls')),
     path('products/', include('product.urls')),
+    path('cart/', include('cart.urls')),
+    path('orders/', include('orders.urls')),
 
 )
 

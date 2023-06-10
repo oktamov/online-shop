@@ -9,12 +9,21 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import datetime
 import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -39,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
     'drf_yasg',
     'django_filters',
 
@@ -46,7 +57,7 @@ INSTALLED_APPS = [
     'users',
     'product',
     'cart',
-    'notifications',
+    # 'notifications',
     'orders',
 ]
 
@@ -141,18 +152,27 @@ STATIC_ROOT = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SMS_EMAIL = env("SMS_EMAIL")
+SMS_KEY = env("SMS_KEY")
+
+
+AUTH_USER_MODEL = "users.User"
+
+
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
+        'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
 
 }
 
-AUTH_USER_MODEL = "users.User"
 
 LOCALE_PATHS = [
     BASE_DIR / 'locale/',
 ]
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = "redis://localhost:6379/0"

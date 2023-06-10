@@ -43,15 +43,9 @@ class Product(models.Model):
         return super().save(force_insert, force_update, using, update_fields)
 
 
-class Specification(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='specification')
-
-    def __str__(self):
-        return self.product.name
-
 
 class SpecificationAttribute(models.Model):
-    specification = models.ForeignKey(Specification, on_delete=models.CASCADE, related_name='attributes')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
     attribute_name = models.CharField(max_length=100)
     attribute_value = models.CharField(max_length=100)
 
