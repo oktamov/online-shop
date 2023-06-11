@@ -29,9 +29,11 @@ class CartQuantityPlus(APIView):
         user = request.user
         product = Product.objects.get(id=product_pk)
         quantity = Cart.objects.get(user=user, product=product).quantity
-        price = Cart.objects.get(user=user, product=product).price
-        Cart.objects.update(quantity=quantity + 1, price=price + product.price)
-        return Response(status=status.HTTP_200_OK)
+        if quantity <= product.count:
+            price = Cart.objects.get(user=user, product=product).price
+            Cart.objects.update(quantity=quantity + 1, price=price + product.price)
+            return Response(status=status.HTTP_200_OK)
+        return Response({"detail": "mahsulotimiz soni cheklangan"})
 
 
 class CartQuantityMinus(APIView):
@@ -39,6 +41,9 @@ class CartQuantityMinus(APIView):
         user = request.user
         product = Product.objects.get(id=product_pk)
         quantity = Cart.objects.get(user=user, product=product).quantity
+        if quantity == 1:
+            Cart.objects.filter(user=user, product=product).delete()
+            return Response(status=status.HTTP_200_OK)
         price = Cart.objects.get(user=user, product=product).price
         Cart.objects.update(quantity=quantity - 1, price=price - product.price)
         return Response(status=status.HTTP_200_OK)

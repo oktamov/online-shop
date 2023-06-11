@@ -21,15 +21,16 @@ class BaseCategoryView(generics.ListAPIView):
     serializer_class = CategorySerializer
 
 
-class CategoryProductView(APIView, CustomPageNumberPagination):
+class CategoryProductListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     ordering_fields = ['price', 'rating', 'updated_year']
     search_fields = ['name']
     filterset_class = CategoryFilter
     serializer_class = ProductSerializer
+    pagination_class = CustomPageNumberPagination
 
-    @swagger_auto_schema(method='get')
-    def get(self, request, slug):
+    def get_queryset(self):
+        slug = self.kwargs['slug']
         try:
             category = Category.objects.get(slug=slug)
             products = Product.objects.filter(category=category)
@@ -37,65 +38,42 @@ class CategoryProductView(APIView, CustomPageNumberPagination):
                 child_categories = category.child_category.all()
                 products = Product.objects.filter(category__in=child_categories)
 
-            order_by = request.GET.get('ordering')
-
-            if order_by == 'price':
-                products = products.order_by('price')
-            elif order_by == '-price':
-                products = products.order_by('-price')
-            elif order_by == 'rating':
+            order_by = self.request.GET.get('ordering')
+            if order_by == 'rating':
                 products = products.order_by('-average_rating')
-            elif order_by == 'updated_year':
-                products = products.order_by('-updated_year')
 
-            filter_set = CategoryFilter(request.GET, queryset=products)
+            filter_set = CategoryFilter(self.request.GET, queryset=products)
+            return filter_set.qs
 
-            page = self.paginate_queryset(filter_set.qs)
-            if page is not None:
-                serializer = self.serializer_class(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-            serializer = self.serializer_class(filter_set.qs, many=True)
-            return Response(serializer.data)
-            # ----
         except Category.DoesNotExist:
-            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-
-
-class BrandProductView(APIView):
-    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
-    ordering_fields = ['price', 'rating', 'updated_year']
-    search_fields = ['name']
-    filterset_class = BrandFilter
-
-    @swagger_auto_schema(method='get')
-    def get(self, request, slug):
-        try:
-            brand = Brand.objects.get(slug=slug)
-            products = Product.objects.filter(brand=brand)
-
-            order_by = request.GET.get('ordering')
-            search = request.GET.get('search')
-
-            if search:
-                products = products.filter(name__icontains=search)
-            if order_by == '-price':
-                products = products.order_by('-price')
-            elif order_by == 'price':
-                products = products.order_by('price')
-            elif order_by == 'rating':
-                products = products.order_by('-average_rating')
-            elif order_by == 'updated_year':
-                products = products.order_by('-updated_year')
-
-            filter_set = BrandFilter(request.GET, queryset=products)
-            serializer = ProductSerializer(filter_set.qs, many=True)
-
-            return Response(serializer.data)
-        except Category.DoesNotExist:
-            return Response({'error': 'Brand not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Product.objects.none()
 
 
 class BrandView(generics.ListAPIView):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
+
+
+class BrandProductView(generics.ListAPIView):
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    ordering_fields = ['price', 'rating', 'updated_year']
+    search_fields = ['name']
+    filterset_class = BrandFilter
+    serializer_class = ProductSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        slug = self.kwargs['slug']
+        try:
+            brand = Brand.objects.get(slug=slug)
+            products = Product.objects.filter(brand=brand)
+
+            order_by = self.request.GET.get('ordering')
+            if order_by == 'rating':
+                products = products.order_by('-average_rating')
+
+            filter_set = CategoryFilter(self.request.GET, queryset=products)
+            return filter_set.qs
+
+        except Category.DoesNotExist:
+            return Product.objects.none()

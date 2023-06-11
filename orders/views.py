@@ -20,13 +20,19 @@ class OrderCreateView(generics.CreateAPIView):
     queryset = Order.objects.all()
     serializer_class = UserOrderSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        Cart.objects.filter(user=user).delete()
+        return Order.objects.filter(user=user)
+
 
 class UserOrderListAPIView(generics.ListAPIView):
     serializer_class = UserOrderSerializer
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
-
+        user = self.request.user
+        queryset = Order.objects.filter(user=user).prefetch_related('user__cart__product')
+        return queryset
 
 # class OrderCreateView(APIView):
 #     def post(self, request, serializer):

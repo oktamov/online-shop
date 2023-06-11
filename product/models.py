@@ -13,6 +13,7 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     count = models.IntegerField(default=0)
     price = models.FloatField(default=0)
+    sales_price = models.FloatField(default=0, blank=True)
     discount = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     liked = models.ManyToManyField(User, default=None, blank=True, related_name='liked')
@@ -40,8 +41,9 @@ class Product(models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.name.upper():
             self.slug = slugify(self.name.lower())
-        return super().save(force_insert, force_update, using, update_fields)
-
+        if self.discount > 0:
+            self.sales_price = self.price - self.price * (self.discount / 100)
+            return super().save(force_insert, force_update, using, update_fields)
 
 
 class SpecificationAttribute(models.Model):

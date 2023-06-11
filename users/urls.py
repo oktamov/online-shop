@@ -4,5 +4,5 @@ from users.views import SendPhoneVerificationCodeView, CheckPhoneVerificationCod
 
 urlpatterns = [
     path('send-code', SendPhoneVerificationCodeView.as_view()),
-    path('check-code', CheckPhoneVerificationCodeView.as_view()),
+    path('check-code/login', CheckPhoneVerificationCodeView.as_view()),
 ]

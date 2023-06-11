@@ -22,7 +22,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
 
 class UserOrderSerializer(serializers.ModelSerializer):
-    cart_products = CartSerializer(many=True, read_only=True)
+    cart_products = CartSerializer(many=True, read_only=True, source='user.cart')
 
     class Meta:
         model = Order
