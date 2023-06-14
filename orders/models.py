@@ -2,7 +2,6 @@ from django.db import models
 
 from users.models import User
 
-
 PAYMENT_METHODS = [
     ('Naqd pul', 'Naqd'),
     ('Karta', 'Karta'),
@@ -23,8 +22,6 @@ class Order(models.Model):
     promo_kod = models.CharField(max_length=10, null=True, blank=True)
     pyment = models.CharField(max_length=10, choices=PAYMENT_METHODS)
     date = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        self.name = self.user.name
-        self.phone = self.user.phone_number
-        super().save(*args, **kwargs)
+    is_viewed = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
+    is_sold = models.BooleanField(default=False)

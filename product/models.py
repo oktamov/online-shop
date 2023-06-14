@@ -46,10 +46,20 @@ class Product(models.Model):
             return super().save(force_insert, force_update, using, update_fields)
 
 
+class SpecificationName(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class SpecificationAttribute(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
-    attribute_name = models.CharField(max_length=100)
-    attribute_value = models.CharField(max_length=100)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specification_attributes')
+    name = models.ForeignKey(SpecificationName, on_delete=models.CASCADE, related_name='attributes')
+    value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.product} -> {self.name}: {self.value}'
 
 
 RATING_CHOICES = [
@@ -64,7 +74,7 @@ RATING_CHOICES = [
 class Rating(models.Model):
     product = models.ForeignKey(Product, related_name='rating',
                                 on_delete=models.CASCADE)
-    comment = models.TextField(null=True)
+    comment = models.TextField(blank=True, null=True)
     ratings = models.CharField(max_length=5, choices=RATING_CHOICES, default=1)
 
     @property

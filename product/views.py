@@ -7,15 +7,13 @@ from rest_framework.views import APIView
 from paginations import CustomPageNumberPagination
 from .filters import ProductFilter
 from .serializers import ProductSerializer, RatingSerializer
-from .models import Product, Rating
+from .models import Product, Rating, SpecificationAttribute
 
 
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
-    # filterset_fields = ("category__slug", "brand__slug", "specification__attributes__attribute_name",
-    #                     "specification__attributes__attribute_value")
     filterset_class = ProductFilter
     ordering_fields = ("price", 'average_rating', 'updated_year')
     search_fields = ("name", "slug", "category__title", "brand__name")
@@ -26,18 +24,14 @@ class ProductDetailView(APIView):
     def get(self, request, slug):
         try:
             product = Product.objects.get(slug=slug)
-            specification = product.specification
-            attributes = specification.attributes.all()
+            specification_attributes = SpecificationAttribute.objects.filter(
+                product=product)
+            attribute_dict = {attr.name.name: attr.value for attr in specification_attributes}
+
             ratings = product.rating.all()
             images = product.product_image.values_list('image', flat=True)
             attributes_list = []
-            for attribute in attributes:
-                attribute_dict = {
-                    'name': attribute.attribute_name,
-                    'value': attribute.attribute_value
-                }
-                attributes_list.append(attribute_dict)
-
+            attributes_list.append(attribute_dict)
             ratings_list = []
             for rating in ratings:
                 rating_dict = {
@@ -98,6 +92,6 @@ class ProductLikedView(APIView):
 
 class ProductLikedList(APIView):
     def get(self, request):
-        liked_product = Product.objects.filter(liked__username=request.user.username)
+        liked_product = Product.objects.filter(liked__phone_number=request.user.phone_number)
         serializer = ProductSerializer(liked_product, many=True)
         return Response(serializer.data)
