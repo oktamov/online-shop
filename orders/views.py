@@ -1,4 +1,5 @@
 from rest_framework import generics, status, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -15,26 +16,36 @@ class OrderView(generics.ListAPIView):
 
 
 class OrderCreateView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
     serializer_class = UserOrderSerializer
 
-    def get_queryset(self):
-        user = self.request.user
-        Cart.objects.filter(user=user).delete()
-        return Order.objects.filter(user=user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data.get("phone")
+        region = serializer.validated_data.get("region")
+        carts = Cart.objects.filter(user=request.user, order=None)
+        if not carts:
+            return Response({'status': "avval mahsulotni savatchaga qoshing"})
+
+        order = Order.objects.create(user=request.user, phone=phone, region=region)
+        for cart in carts:
+            cart.order = order
+            cart.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UserOrderListAPIView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-        order = Order.objects.get(user=user)
-        if order.is_sold:
-            cart = Cart.objects.filter(user=user)
+        order = Order.objects.filter(user=user, is_sold=True)
+        if order:
+            cart = Cart.objects.filter(user=user, order__in=order)
             product = Product.objects.filter(cart_products__in=cart)
             serializer = ProductForCartSerializer(product, many=True)
             return Response(serializer.data)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'status': "sizda sotib olingan mahsulotlar yoq"})
 
 
 class OrderListAPIViewForAdmin(generics.ListAPIView):

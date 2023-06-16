@@ -25,3 +25,8 @@ class Order(models.Model):
     is_viewed = models.BooleanField(default=False)
     is_accepted = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
+
+# /orders/<id>/
+# {
+#     "is_sold": False,
+# }

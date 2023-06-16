@@ -14,6 +14,7 @@ django-environ = "*"
 django-rest-auth = "*"
 redis = "*"
 celery = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

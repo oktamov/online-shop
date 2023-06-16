@@ -1,9 +1,8 @@
+from django.core.cache import cache
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from paginations import CustomPageNumberPagination
 from product.models import Product
@@ -11,9 +10,6 @@ from .filters import BrandFilter, CategoryFilter
 from .models import Category, Brand
 from common.serializers import CategorySerializer, BrandSerializer
 from product.serializers import ProductSerializer
-
-
-# Create your views here.
 
 
 class BaseCategoryView(generics.ListAPIView):

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_auth',
     'drf_yasg',
     'django_filters',
+    'corsheaders',
 
     'common',
     'users',
@@ -64,6 +65,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -155,9 +157,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SMS_EMAIL = env("SMS_EMAIL")
 SMS_KEY = env("SMS_KEY")
 
-
 AUTH_USER_MODEL = "users.User"
-
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -169,10 +169,19 @@ REST_FRAMEWORK = {
 
 }
 
-
 LOCALE_PATHS = [
     BASE_DIR / 'locale/',
 ]
 
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BROKER_URL = "redis://localhost:6379/0"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
+
+CORS_ALLOW_ALL_ORIGINS = True
+

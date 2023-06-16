@@ -1,20 +1,20 @@
 from django.db import models
 from django.utils.text import slugify
-
+from django.utils.translation import gettext_lazy as _
 from common.models import Category, Brand
 from users.models import User
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(_("Name"), max_length=255)
     slug = models.CharField(max_length=255, unique=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category_product")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="brand_product")
-    description = models.TextField(blank=True)
+    description = models.TextField(_("Description"), blank=True)
     count = models.IntegerField(default=0)
     price = models.FloatField(default=0)
     sales_price = models.FloatField(default=0, blank=True)
-    discount = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0, blank=True, null=True)
     views = models.IntegerField(default=0)
     liked = models.ManyToManyField(User, default=None, blank=True, related_name='liked')
     updated_year = models.DateTimeField(auto_now=True)
@@ -43,11 +43,13 @@ class Product(models.Model):
             self.slug = slugify(self.name.lower())
         if self.discount > 0:
             self.sales_price = self.price - self.price * (self.discount / 100)
-            return super().save(force_insert, force_update, using, update_fields)
+        if self.discount == 0:
+            self.sales_price = self.price
+        return super().save(force_insert, force_update, using, update_fields)
 
 
 class SpecificationName(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(_("Name"), max_length=255)
 
     def __str__(self):
         return self.name
@@ -56,7 +58,7 @@ class SpecificationName(models.Model):
 class SpecificationAttribute(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='specification_attributes')
     name = models.ForeignKey(SpecificationName, on_delete=models.CASCADE, related_name='attributes')
-    value = models.CharField(max_length=100)
+    value = models.CharField(_("Value"), max_length=100)
 
     def __str__(self):
         return f'{self.product} -> {self.name}: {self.value}'

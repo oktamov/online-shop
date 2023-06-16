@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from paginations import CustomPageNumberPagination
 from .filters import ProductFilter
-from .serializers import ProductSerializer, RatingSerializer
+from .serializers import ProductSerializer, RatingSerializer, ProductForLikedSerializer
 from .models import Product, Rating, SpecificationAttribute
 
 
@@ -15,7 +15,7 @@ class ProductListView(generics.ListAPIView):
     serializer_class = ProductSerializer
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
     filterset_class = ProductFilter
-    ordering_fields = ("price", 'average_rating', 'updated_year')
+    ordering_fields = ("price", 'average_rating', 'updated_year', 'discount')
     search_fields = ("name", "slug", "category__title", "brand__name")
     pagination_class = CustomPageNumberPagination
 
@@ -93,5 +93,5 @@ class ProductLikedView(APIView):
 class ProductLikedList(APIView):
     def get(self, request):
         liked_product = Product.objects.filter(liked__phone_number=request.user.phone_number)
-        serializer = ProductSerializer(liked_product, many=True)
+        serializer = ProductForLikedSerializer(liked_product, many=True)
         return Response(serializer.data)

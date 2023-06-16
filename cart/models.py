@@ -18,13 +18,13 @@ class Cart(models.Model):
 
     @property
     def total_price(self):
-        cart_items = Cart.objects.filter(user=self.user)
+        cart_items = Cart.objects.filter(user=self.user, order=self.order)
         total = sum(item.price for item in cart_items)
         return total
 
     @property
     def total_quantity(self):
-        cart_items = Cart.objects.filter(user=self.user)
+        cart_items = Cart.objects.filter(user=self.user, order=self.order)
         total = sum(item.quantity for item in cart_items)
         return total
 
