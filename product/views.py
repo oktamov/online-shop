@@ -93,5 +93,5 @@ class ProductLikedView(APIView):
 class ProductLikedList(APIView):
     def get(self, request):
         liked_product = Product.objects.filter(liked__phone_number=request.user.phone_number)
-        serializer = ProductForLikedSerializer(liked_product, many=True)
+        serializer = ProductSerializer(liked_product, many=True, context={'request': request})
         return Response(serializer.data)

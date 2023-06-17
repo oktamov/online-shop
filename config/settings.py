@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-lajie!o)dpxzco*e$ai!ptib21x@e^mkx6sd4k(78f9y8k2u#5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -136,6 +136,7 @@ MODELTRANSLATION_DEFAULT_LANGUAGE = "uz"
 
 MODELTRANSLATION_TRANSLATION_FILES = (
     "common.translation",
+    "product.translation",
 )
 
 TIME_ZONE = 'Asia/Tashkent'
@@ -184,4 +185,3 @@ CACHES = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
-
