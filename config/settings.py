@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import datetime
 import os
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
 
 import environ
 
@@ -168,6 +167,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 
+}
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'DEEP_LINKING': True,
 }
 
 LOCALE_PATHS = [
