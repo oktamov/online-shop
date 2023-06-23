@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +9,7 @@ from .models import Cart
 
 
 class CartAPIView(APIView):
+    # @swagger_auto_schema(request_body=CartSerializer)
     def get(self, request):
         cart_items = Cart.objects.filter(user=request.user, order=None)
 

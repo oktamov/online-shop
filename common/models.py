@@ -3,9 +3,6 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
-# Create your models here.
-
-
 class Category(models.Model):
     title = models.CharField(_("Name"), max_length=255)
     slug = models.CharField(max_length=255, blank=True, unique=True)

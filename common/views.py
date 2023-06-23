@@ -1,8 +1,6 @@
-from django.core.cache import cache
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.response import Response
 
 from paginations import CustomPageNumberPagination
 from product.models import Product

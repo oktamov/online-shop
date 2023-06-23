@@ -10,7 +10,6 @@ class ChildCategory(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    # child_category = Category.child_category
     child_category = ChildCategory(many=True, read_only=True)
 
     class Meta:

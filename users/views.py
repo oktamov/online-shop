@@ -24,7 +24,7 @@ class SendPhoneVerificationCodeView(APIView):
         )
         verification_code.expired_at = verification_code.last_sent_time + timedelta(seconds=30)
         verification_code.save(update_fields=["expired_at"])
-        # send_verification_code.delay(phone, code)
+        send_verification_code.delay(phone, code)
         return Response({"detail": "Successfully sent email verification code."})
 
 
@@ -46,10 +46,10 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
 
         name = serializer.validated_data.get("name")
         try:
-            user = User.objects.get(phone_number=phone)
+            User.objects.get(phone_number=phone)
         except User.DoesNotExist:
             user = User.objects.create(phone_number=phone, name=name)
             if user:
                 from rest_framework.authtoken.models import Token
                 token = Token.objects.create(user=user)
-                return Response({"Token": token.key, "detail": "Verification code is verified."})
+                return Response({"Token": token.key})

@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ from rest_framework.views import APIView
 
 from paginations import CustomPageNumberPagination
 from .filters import ProductFilter
-from .serializers import ProductSerializer, RatingSerializer, ProductForLikedSerializer
+from .serializers import ProductSerializer, RatingSerializer
 from .models import Product, Rating, SpecificationAttribute
 
 
@@ -91,6 +92,7 @@ class ProductLikedView(APIView):
 
 
 class ProductLikedList(APIView):
+    # @swagger_auto_schema(request_body=ProductSerializer)
     def get(self, request):
         liked_product = Product.objects.filter(liked__phone_number=request.user.phone_number)
         serializer = ProductSerializer(liked_product, many=True, context={'request': request})

@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,13 +24,23 @@ class OrderCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        name = serializer.validated_data.get("name")
         phone = serializer.validated_data.get("phone")
         region = serializer.validated_data.get("region")
+        city = serializer.validated_data.get("city")
+        village = serializer.validated_data.get("village")
+        address = serializer.validated_data.get("address")
+        job_address = serializer.validated_data.get("job_address")
+        addition = serializer.validated_data.get("addition")
+        promo_kod = serializer.validated_data.get("promo_kod")
+        pyment = serializer.validated_data.get("pyment")
         carts = Cart.objects.filter(user=request.user, order=None)
         if not carts:
             return Response({'status': "avval mahsulotni savatchaga qoshing"})
 
-        order = Order.objects.create(user=request.user, phone=phone, region=region)
+        order = Order.objects.create(user=request.user, name=name, phone=phone, region=region, city=city,
+                                     village=village, address=address, job_address=job_address, addition=addition,
+                                     promo_kod=promo_kod, pyment=pyment)
         for cart in carts:
             cart.order = order
             cart.save()
@@ -37,6 +48,7 @@ class OrderCreateView(generics.CreateAPIView):
 
 
 class UserOrderListAPIView(APIView):
+    # @swagger_auto_schema(request_body=ProductForCartSerializer)
     def get(self, request, *args, **kwargs):
         user = request.user
         order = Order.objects.filter(user=user, is_sold=True)
@@ -58,6 +70,7 @@ class OrderListAPIViewForAdmin(generics.ListAPIView):
 
 
 class OrderDetailViewedAPIView(APIView):
+    # @swagger_auto_schema(request_body=UserOrderSerializer)
     def get(self, request, *args, **kwargs):
         order = Order.objects.get(id=kwargs['pk'])
         order.is_viewed = True

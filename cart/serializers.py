@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
 from cart.models import Cart
-from product.models import Product
-from product.serializers import ProductForCartSerializer, ProductSerializer
+from product.serializers import ProductForCartSerializer
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -14,7 +13,6 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class CartSerializerForOrder(serializers.ModelSerializer):
-    # product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
 
     class Meta:
         model = Cart
