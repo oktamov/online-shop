@@ -170,7 +170,12 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        }
+    },
+    'USE_SESSION_AUTH': True,
     'DEEP_LINKING': True,
 }
 
