@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.shortcuts import render
 from django.utils.crypto import get_random_string
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.exceptions import ValidationError
@@ -39,7 +40,7 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
         code = serializer.validated_data.get("code")
         verification_code = self.get_queryset().filter(phone=phone).order_by(
             "-last_sent_time").first()
-        if verification_code and verification_code.code != code and verification_code.is_expire:
+        if verification_code is None or verification_code.code != code or verification_code.is_expire:
             raise ValidationError("Verification code invalid.")
         verification_code.is_verified = True
         verification_code.save(update_fields=["is_verified"])
@@ -53,3 +54,6 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
                 from rest_framework.authtoken.models import Token
                 token = Token.objects.create(user=user)
                 return Response({"Token": token.key})
+
+
+

@@ -1,4 +1,3 @@
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,12 +7,19 @@ from cart.models import Cart
 from product.models import Product
 from product.serializers import ProductForCartSerializer
 from .models import Order
-from .serializers import OrderSerializer, UserOrderSerializer
+from .serializers import UserOrderSerializer
 
 
-class OrderView(generics.ListAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+class UserOrderListAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        order = Order.objects.filter(user=user, is_sold=True)
+        if order:
+            cart = Cart.objects.filter(user=user, order__in=order)
+            product = Product.objects.filter(cart_products__in=cart)
+            serializer = ProductForCartSerializer(product, many=True)
+            return Response(serializer.data)
+        return Response({'status': "sizda sotib olingan mahsulotlar yoq"})
 
 
 class OrderCreateView(generics.CreateAPIView):
@@ -47,19 +53,6 @@ class OrderCreateView(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class UserOrderListAPIView(APIView):
-    # @swagger_auto_schema(request_body=ProductForCartSerializer)
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        order = Order.objects.filter(user=user, is_sold=True)
-        if order:
-            cart = Cart.objects.filter(user=user, order__in=order)
-            product = Product.objects.filter(cart_products__in=cart)
-            serializer = ProductForCartSerializer(product, many=True)
-            return Response(serializer.data)
-        return Response({'status': "sizda sotib olingan mahsulotlar yoq"})
-
-
 class OrderListAPIViewForAdmin(generics.ListAPIView):
     serializer_class = UserOrderSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -70,7 +63,6 @@ class OrderListAPIViewForAdmin(generics.ListAPIView):
 
 
 class OrderDetailViewedAPIView(APIView):
-    # @swagger_auto_schema(request_body=UserOrderSerializer)
     def get(self, request, *args, **kwargs):
         order = Order.objects.get(id=kwargs['pk'])
         order.is_viewed = True

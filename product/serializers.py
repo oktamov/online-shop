@@ -53,3 +53,7 @@ class ProductForCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'sales_price', 'product_image']
+
+
+class ImportFileSerializer(serializers.Serializer):
+    file = serializers.FileField()

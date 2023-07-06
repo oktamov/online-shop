@@ -44,6 +44,7 @@ urlpatterns = i18n_patterns(
     path('products/', include('product.urls')),
     path('cart/', include('cart.urls')),
     path('orders/', include('orders.urls')),
+    path('bot/', include('bot.urls'), name='bot'),
 
 )
 

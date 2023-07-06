@@ -1,13 +1,19 @@
+from datetime import datetime
+from io import BytesIO
+
+import pandas as pd
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
+from rest_framework.parsers import MultiPartParser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from paginations import CustomPageNumberPagination
 from .filters import ProductFilter
-from .serializers import ProductSerializer, RatingSerializer
+from .serializers import ProductSerializer, RatingSerializer, ImportFileSerializer
 from .models import Product, Rating, SpecificationAttribute
 
 
@@ -76,6 +82,8 @@ class ProductLikedView(APIView):
         try:
             product = Product.objects.get(slug=slug)
             user = request.user
+            if not user.is_authenticated:
+                return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
 
             if user in product.liked.all():
                 product.liked.remove(user)
@@ -92,8 +100,49 @@ class ProductLikedView(APIView):
 
 
 class ProductLikedList(APIView):
-    # @swagger_auto_schema(request_body=ProductSerializer)
     def get(self, request):
         liked_product = Product.objects.filter(liked__phone_number=request.user.phone_number)
         serializer = ProductSerializer(liked_product, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class ProductExportView(APIView):
+    def get(self, request):
+        columns = {
+            "id": "ID",
+            "name": "Nomi"
+        }
+        df = pd.DataFrame(
+            list(
+                Product.objects.values(
+                    "id", "name"
+                )
+            ),
+            columns=list(columns.keys())
+        )
+        df.rename(columns=columns, inplace=True)
+
+        file_like_object = BytesIO()
+        df.to_excel(file_like_object, index=False)
+        file_like_object.seek(0)  # move to the beginning of file
+        response = FileResponse(file_like_object)
+        filename = f"Courses_{datetime.now().strftime('%Y%m%d_%H%M')}"
+        response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
+
+        return response
+
+
+class ProductImportView(APIView):
+    parser_classes = [MultiPartParser]
+
+    @swagger_auto_schema(request_body=ImportFileSerializer)
+    def post(self, request):
+        serializer = ImportFileSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        file = request.FILES.get("file")
+        df = pd.read_excel(file)
+        for index, row in df.iterrows():
+            Product.objects.update_or_create(id=row["ID"], defaults={
+                "name": row["Nomi"]
+            })
+        return Response("Course import started.")

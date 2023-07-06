@@ -9,7 +9,6 @@ from .models import Cart
 
 
 class CartAPIView(APIView):
-    # @swagger_auto_schema(request_body=CartSerializer)
     def get(self, request):
         cart_items = Cart.objects.filter(user=request.user, order=None)
 
