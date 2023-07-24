@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.contrib.auth import login
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
 from drf_yasg.utils import swagger_auto_schema
@@ -7,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authtoken.models import Token
 
 from .serializers import SendPhoneCodeSerializer, PhoneVerificationCodeSerializer
 from .models import User, VerificationCode
@@ -47,13 +49,11 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
 
         name = serializer.validated_data.get("name")
         try:
-            User.objects.get(phone_number=phone)
+            user = User.objects.get(phone_number=phone)
+            login(request, user)
         except User.DoesNotExist:
             user = User.objects.create(phone_number=phone, name=name)
             if user:
-                from rest_framework.authtoken.models import Token
                 token = Token.objects.create(user=user)
+                login(request, user)
                 return Response({"Token": token.key})
-
-
-

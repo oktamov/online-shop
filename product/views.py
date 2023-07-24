@@ -29,6 +29,7 @@ class ProductListView(generics.ListAPIView):
 
 class ProductDetailView(APIView):
     def get(self, request, slug):
+        attributes_list = []
         try:
             product = Product.objects.get(slug=slug)
             specification_attributes = SpecificationAttribute.objects.filter(
@@ -37,7 +38,6 @@ class ProductDetailView(APIView):
 
             ratings = product.rating.all()
             images = product.product_image.values_list('image', flat=True)
-            attributes_list = []
             attributes_list.append(attribute_dict)
             ratings_list = []
             for rating in ratings:
